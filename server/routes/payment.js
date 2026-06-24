@@ -4,6 +4,26 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Order = require('../models/Order');
 const authMiddleware = require('../middleware/auth');
 
+
+
+// Webhook
+router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+    try {
+        event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    } catch (err) {
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+    if (event.type === 'checkout.session.completed') {
+        const session = event.data.object;
+        await Order.findByIdAndUpdate(session.metadata.orderId, { paymentStatus: 'Paid' });
+    }
+    res.json({ received: true });
+});
+
+router.use(express.json());
+
 router.post('/create-checkout-session', async (req, res) => {
     try {
         const { cart, orderId } = req.body;
@@ -30,25 +50,6 @@ router.post('/create-checkout-session', async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
-});
-
-// Webhook
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-    const sig = req.headers['stripe-signature'];
-    let event;
-    try {
-        event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-    } catch (err) {
-        return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-
-    if (event.type === 'checkout.session.completed') {
-        const session = event.data.object;
-        const orderId = session.metadata.orderId;
-        // Status update logic
-        await Order.findByIdAndUpdate(orderId, { paymentStatus: 'Paid' });
-    }
-    res.json({ received: true });
 });
 
 
