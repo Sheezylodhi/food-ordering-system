@@ -12,7 +12,11 @@ const paymentRoutes = require('./routes/payment');
 
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: ["https://onlineresturantfood.netlify.app", "http://localhost:5173"], // Localhost aur Netlify dono daal do
+    credentials: true, // Zaroori hai agar tum tokens use kar rahe ho
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+}));
 app.use(express.json()); // JSON ke liye
 app.use(express.urlencoded({ extended: true }));
 

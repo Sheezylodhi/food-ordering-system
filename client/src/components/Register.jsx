@@ -10,16 +10,18 @@ function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
     try {
-      await axios.post('http://localhost:5001/api/auth/register', formData);
+      await axios.post(`${apiBaseUrl}/api/auth/register`, formData);
       setStep(2);
     } catch (err) { alert(err.response?.data?.error || "Registration Failed"); }
   };
 
 // Register.jsx mein yeh logic use karo
 const handleVerify = async () => {
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
   try {
-    const response = await axios.post('http://localhost:5001/api/auth/verify-otp', { 
+   const response = await axios.post(`${apiBaseUrl}/api/auth/verify-otp`, { 
       email: formData.email, 
       otp: otp // .trim() ki zaroorat nahi agar input type text hai
     });
