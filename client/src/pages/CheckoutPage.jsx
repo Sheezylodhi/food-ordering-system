@@ -31,7 +31,7 @@ const CheckoutPage = () => {
     const token = localStorage.getItem('token'); 
     
     // Step 1: Save Order Details to DB
-    const { data } = await axios.post(`${apiBaseUrl}/api/payment/save-order-details`, {
+    const { data } = await axios.post(`${apiBaseUrl}/api/payments/save-order-details`, {
       customerDetails: { ...form, paymentMethod },
       cart,
       total: grandTotal,
@@ -42,7 +42,7 @@ const CheckoutPage = () => {
 
     // Step 2: Handle Payment Logic
     if (paymentMethod === 'Online') {
-      const res = await axios.post(`${apiBaseUrl}/api/payment/create-checkout-session`, {
+      const res = await axios.post(`${apiBaseUrl}/api/payments/create-checkout-session`, {
         cart,
         orderId: data.orderId
       }, {
