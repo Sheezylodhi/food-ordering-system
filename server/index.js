@@ -8,6 +8,8 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const paymentRoutes = require('./routes/payment');
+const reservationRoutes = require('./routes/reservationRoutes');
+
 
 
 
@@ -31,6 +33,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/reservations', reservationRoutes);
+
 
 
 app.get('/', (req, res) => {
