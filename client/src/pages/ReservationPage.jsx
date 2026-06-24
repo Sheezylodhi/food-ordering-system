@@ -2,21 +2,25 @@
 import React, { useState } from 'react'; // 1. Yahan useState add kiya
 import axios from 'axios';
 import Footer from '../components/Footer';
-
-
-
 const ReservationPage = () => {
     const [formData, setFormData] = useState({ date: '', guests: '2 People', name: '', email: '', specialRequest: '' });
+  const [loading, setLoading] = useState(false); // Loading state add ki
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-  
-  try {
-    await axios.post(`${apiBaseUrl}/api/reservations`, formData);
-    alert("Reservation request sent!");
-  } catch (err) { alert("Failed to reserve table"); }
-};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true); // Process shuru
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+    
+    try {
+      await axios.post(`${apiBaseUrl}/api/reservations`, formData);
+      alert("Reservation request sent!");
+      setFormData({ date: '', guests: '2 People', name: '', email: '', specialRequest: '' }); // Form clear
+    } catch (err) { 
+      alert("Failed to reserve table"); 
+    } finally {
+      setLoading(false); // Process khatam
+    }
+  };
 
   return (
     // Parent container ko screen height di hai
@@ -80,9 +84,13 @@ const handleSubmit = async (e) => {
             </div>
             
             {/* Button type submit zaroori hai */}
-            <button type="submit" className="w-full bg-black text-white py-5 mt-4 hover:bg-amber-600 transition-all duration-300 uppercase tracking-[0.2em] text-[11px] font-bold">
-              Confirm Reservation
-            </button>
+           <button 
+      type="submit" 
+      disabled={loading} // Loading ke waqt button disable
+      className="w-full bg-black text-white py-5 mt-4 hover:bg-amber-600 transition-all duration-300 uppercase tracking-[0.2em] text-[11px] font-bold disabled:opacity-50"
+    >
+      {loading ? "Sending..." : "Confirm Reservation"}
+    </button>
           </form>
         </div>
       </div>

@@ -1,0 +1,11 @@
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS // Make sure this is a 16-character App Password
+  }
+});
+
+module.exports = transporter;
