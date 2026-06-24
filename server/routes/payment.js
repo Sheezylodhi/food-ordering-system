@@ -7,6 +7,8 @@ const authMiddleware = require('../middleware/auth');
 router.post('/create-checkout-session', async (req, res) => {
     try {
         const { cart, orderId } = req.body;
+        // Use environment variable for Frontend URL
+        const domain = process.env.CLIENT_URL || 'http://localhost:5173';
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -20,17 +22,35 @@ router.post('/create-checkout-session', async (req, res) => {
             })),
             mode: 'payment',
             metadata: { orderId: orderId }, 
-            success_url: `http://localhost:5173/success?orderId=${orderId}`,
-            cancel_url: `http://localhost:5173/cancel`,
+            success_url: `${domain}/success?orderId=${orderId}`,
+            cancel_url: `${domain}/cancel`,
         });
 
-        // Yeh crucial hai: response mein 'url' key honi chahiye
         res.json({ url: session.url });
     } catch (err) {
-        console.error("Stripe Backend Error:", err);
         res.status(500).json({ error: err.message });
     }
 });
+
+// Webhook
+router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+    try {
+        event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    } catch (err) {
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    if (event.type === 'checkout.session.completed') {
+        const session = event.data.object;
+        const orderId = session.metadata.orderId;
+        // Status update logic
+        await Order.findByIdAndUpdate(orderId, { paymentStatus: 'Paid' });
+    }
+    res.json({ received: true });
+});
+
 // routes/payments.js
 router.post('/save-order-details', async (req, res) => {
     try {
@@ -56,32 +76,5 @@ router.post('/save-order-details', async (req, res) => {
     }
 });
 
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-    const sig = req.headers['stripe-signature'];
-    let event;
-
-    try {
-        event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-    } catch (err) {
-        return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-
-    // Payment Successful hone par
-    if (event.type === 'checkout.session.completed') {
-        const session = event.data.object;
-        const orderId = session.metadata.orderId;
-
-        // Database mein Order update karo
-        await Order.findByIdAndUpdate(orderId, { paymentStatus: 'Paid' });
-        console.log(`Order ${orderId} marked as Paid!`);
-    }
-
-    res.json({ received: true });
-});
-
-router.get('/:orderId', authMiddleware, async (req, res) => {
-    const order = await Order.findById(req.params.orderId);
-    res.json(order);
-});
 
 module.exports = router;
