@@ -9,30 +9,32 @@ function Login() {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const navigate = useNavigate();
 const handleSubmit = async (e) => {
-    e.preventDefault();
-    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+  e.preventDefault();
+  
+  // Dynamic API Base URL
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+  
+  try {
+    // Ab ye URL automatically live hone par Render ka link utha lega
+    const res = await axios.post(`${apiBaseUrl}${endpoint}`, formData);
     
-    try {
-      const res = await axios.post(`http://localhost:5001${endpoint}`, formData);
-      
-      // Dono (User/Admin) ke liye same key rakho
-      localStorage.setItem('adminToken', res.data.token); 
-      localStorage.setItem('role', res.data.role);
+    // Baaki logic same rahega
+    localStorage.setItem('adminToken', res.data.token); 
+    localStorage.setItem('role', res.data.role);
 
-      window.dispatchEvent(new Event('login-success'));
-      alert(isLogin ? "Welcome Back!" : "Account Created!");
+    window.dispatchEvent(new Event('login-success'));
+    alert(isLogin ? "Welcome Back!" : "Account Created!");
 
-      // Redirection Logic
-      // Agar Admin hai toh hard reload (security) aur agar User hai toh normal navigation
-      if (res.data.role === 'admin') {
-        window.location.replace('/admin-dashboard');
-      } else {
-        navigate('/profile');
-      }
-      
-    } catch (err) {
-      alert("Error: " + (err.response?.data?.error || "Something went wrong"));
+    if (res.data.role === 'admin') {
+      window.location.replace('/admin-dashboard');
+    } else {
+      navigate('/profile');
     }
+    
+  } catch (err) {
+    alert("Error: " + (err.response?.data?.error || "Something went wrong"));
+  }
 };
 
   return (
