@@ -12,7 +12,6 @@ const reservationRoutes = require('./routes/reservationRoutes');
 
 
 
-
 const app = express();
 app.use(cors({
     origin: ["https://onlineresturantfood.netlify.app", "http://localhost:5173"], // Localhost aur Netlify dono daal do
@@ -33,8 +32,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/payment', paymentRoutes);
-app.use('/api/reservations', reservationRoutes);
-
+app.use('/api/reservations' , reservationRoutes);
 
 
 app.get('/', (req, res) => {
