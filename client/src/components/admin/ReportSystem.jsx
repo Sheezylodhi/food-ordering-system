@@ -8,17 +8,23 @@ const ReportSystem = () => {
   const [loading, setLoading] = useState(false);
   const [dates, setDates] = useState({ start: '', end: '' });
 
-  const fetchReport = async () => {
-    if (!dates.start || !dates.end) return alert("Select Date Range!");
-    setLoading(true);
-    try {
-      const { data: response } = await axios.get(`http://localhost:5001/api/admin/reports`, {
-        params: { start: dates.start, end: dates.end }
-      });
-      setData(response);
-    } catch (err) { alert("Error fetching report"); }
-    finally { setLoading(false); }
-  };
+ const fetchReport = async () => {
+  if (!dates.start || !dates.end) return alert("Select Date Range!");
+  
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  setLoading(true);
+  
+  try {
+    const { data: response } = await axios.get(`${apiBaseUrl}/api/admin/reports`, {
+      params: { start: dates.start, end: dates.end }
+    });
+    setData(response);
+  } catch (err) { 
+    alert("Error fetching report"); 
+  } finally { 
+    setLoading(false); 
+  }
+};
 
   const exportToExcel = () => {
     // Excel mein jo columns dikhne chahiye

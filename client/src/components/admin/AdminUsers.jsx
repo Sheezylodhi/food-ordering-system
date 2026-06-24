@@ -10,21 +10,28 @@ const AdminUsers = () => {
   useEffect(() => { fetchUsers(); }, []);
 
   const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const { data } = await axios.get('http://localhost:5001/api/admin/users');
-      setUsers(data);
-    } catch (err) { console.error(err); }
-    finally { setLoading(false); }
-  };
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  setLoading(true);
+  try {
+    const { data } = await axios.get(`${apiBaseUrl}/api/admin/users`);
+    setUsers(data);
+  } catch (err) { 
+    console.error(err); 
+  } finally { 
+    setLoading(false); 
+  }
+};
 
-  const deleteUser = async () => {
-    try {
-      await axios.delete(`http://localhost:5001/api/admin/users/${deleteId}`);
-      setDeleteId(null);
-      fetchUsers();
-    } catch (err) { alert("Delete failed"); }
-  };
+const deleteUser = async () => {
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  try {
+    await axios.delete(`${apiBaseUrl}/api/admin/users/${deleteId}`);
+    setDeleteId(null);
+    fetchUsers();
+  } catch (err) { 
+    alert("Delete failed"); 
+  }
+};
 
   return (
     <div className="p-8 bg-white min-h-screen">

@@ -9,12 +9,19 @@ const AdminDashboard = () => {
     });
 
     useEffect(() => {
-        const fetchAllData = async () => {
-            const { data } = await axios.get('http://localhost:5001/api/admin/analytics');
-            setData(data);
-        };
-        fetchAllData();
-    }, []);
+  const fetchAllData = async () => {
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+    
+    try {
+      const { data } = await axios.get(`${apiBaseUrl}/api/admin/analytics`);
+      setData(data);
+    } catch (err) {
+      console.error("Error fetching analytics:", err);
+    }
+  };
+  
+  fetchAllData();
+}, []);
 
     const COLORS = ['#f59e0b', '#10b981', '#3b82f6', '#ef4444'];
 

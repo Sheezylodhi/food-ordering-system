@@ -6,11 +6,13 @@ const CategoryIcons = ({ onCategoryClick }) => {
     const [categories, setCategories] = useState([]);
     const scrollRef = useRef(null);
 
-    useEffect(() => {
-        axios.get('http://localhost:5001/api/categories')
-            .then(res => setCategories(res.data))
-            .catch(err => console.error("Categories fetch error:", err));
-    }, []);
+   useEffect(() => {
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
+  axios.get(`${apiBaseUrl}/api/categories`)
+    .then(res => setCategories(res.data))
+    .catch(err => console.error("Categories fetch error:", err));
+}, []);
 
     const scroll = (direction) => {
         if (scrollRef.current) {

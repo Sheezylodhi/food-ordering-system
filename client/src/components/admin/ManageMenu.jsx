@@ -15,21 +15,28 @@ const ManageMenu = () => {
   useEffect(() => { fetchMenu(); }, []);
 
   const fetchMenu = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get('http://localhost:5001/api/admin/menu');
-      setMenuItems(res.data);
-    } catch (err) { console.error(err); }
-    finally { setLoading(false); }
-  };
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  setLoading(true);
+  try {
+    const res = await axios.get(`${apiBaseUrl}/api/admin/menu`);
+    setMenuItems(res.data);
+  } catch (err) { 
+    console.error(err); 
+  } finally { 
+    setLoading(false); 
+  }
+};
 
-  const handleDelete = async () => {
-    try {
-      await axios.delete(`http://localhost:5001/api/admin/delete-item/${deleteId}`);
-      setDeleteId(null);
-      fetchMenu();
-    } catch (err) { alert("Delete failed"); }
-  };
+const handleDelete = async () => {
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  try {
+    await axios.delete(`${apiBaseUrl}/api/admin/delete-item/${deleteId}`);
+    setDeleteId(null);
+    fetchMenu();
+  } catch (err) { 
+    alert("Delete failed"); 
+  }
+};
 
   const filtered = menuItems.filter(i => i.name.toLowerCase().includes(search.toLowerCase()));
   const totalPages = Math.ceil(filtered.length / itemsPerPage);

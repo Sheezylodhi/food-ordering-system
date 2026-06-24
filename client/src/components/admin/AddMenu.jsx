@@ -11,15 +11,18 @@ const AddMenu = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ type: null, message: '' });
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await axios.get('http://localhost:5001/api/categories');
-        setCategories(res.data);
-      } catch (err) { console.error("Error fetching categories", err); }
-    };
-    fetchCategories();
-  }, []);
+ useEffect(() => {
+  const fetchCategories = async () => {
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+    try {
+      const res = await axios.get(`${apiBaseUrl}/api/categories`);
+      setCategories(res.data);
+    } catch (err) { 
+      console.error("Error fetching categories", err); 
+    }
+  };
+  fetchCategories();
+}, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -33,28 +36,29 @@ const AddMenu = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setStatus({ type: null, message: '' });
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setStatus({ type: null, message: '' });
 
-    const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => data.append(key, value));
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  const data = new FormData();
+  Object.entries(formData).forEach(([key, value]) => data.append(key, value));
 
-    try {
-      await axios.post('http://localhost:5001/api/admin/add-item', data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      setStatus({ type: 'success', message: 'Dish successfully published to the menu!' });
-      setFormData({ name: '', description: '', price: '', category: '', image: null, calories: '', isFeatured: false });
-      setPreview(null);
-    } catch (err) {
-      setStatus({ type: 'error', message: 'Failed to upload dish. Please try again.' });
-    } finally {
-      setLoading(false);
-      setTimeout(() => setStatus({ type: null, message: '' }), 5000);
-    }
-  };
+  try {
+    await axios.post(`${apiBaseUrl}/api/admin/add-item`, data, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    setStatus({ type: 'success', message: 'Dish successfully published to the menu!' });
+    setFormData({ name: '', description: '', price: '', category: '', image: null, calories: '', isFeatured: false });
+    setPreview(null);
+  } catch (err) {
+    setStatus({ type: 'error', message: 'Failed to upload dish. Please try again.' });
+  } finally {
+    setLoading(false);
+    setTimeout(() => setStatus({ type: null, message: '' }), 5000);
+  }
+};
 
   return (
     <div className="max-w-6xl mx-auto p-8 bg-white min-h-screen">

@@ -12,21 +12,28 @@ const CategoryList = () => {
   useEffect(() => { fetchCategories(); }, []);
 
   const fetchCategories = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get('http://localhost:5001/api/categories');
-      setCategories(res.data);
-    } catch (err) { console.error(err); }
-    finally { setLoading(false); }
-  };
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  setLoading(true);
+  try {
+    const res = await axios.get(`${apiBaseUrl}/api/categories`);
+    setCategories(res.data);
+  } catch (err) { 
+    console.error(err); 
+  } finally { 
+    setLoading(false); 
+  }
+};
 
-  const handleDelete = async () => {
-    try {
-      await axios.delete(`http://localhost:5001/api/categories/delete/${deleteId}`);
-      setDeleteId(null);
-      fetchCategories();
-    } catch (err) { alert("Delete failed"); }
-  };
+const handleDelete = async () => {
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  try {
+    await axios.delete(`${apiBaseUrl}/api/categories/delete/${deleteId}`);
+    setDeleteId(null);
+    fetchCategories();
+  } catch (err) { 
+    alert("Delete failed"); 
+  }
+};
 
   return (
     <div className="p-8 bg-slate-50 min-h-screen">

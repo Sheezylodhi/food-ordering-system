@@ -11,24 +11,24 @@ const EditCategory = ({ category, onCancel, onSave }) => {
   const [loading, setLoading] = useState(false);
 
   const handleUpdate = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
-    const data = new FormData();
-    data.append('name', formData.name);
-    if (formData.icon) data.append('icon', formData.icon);
+  const data = new FormData();
+  data.append('name', formData.name);
+  if (formData.icon) data.append('icon', formData.icon);
 
-    try {
-      // Backend mein .put route par FormData handle karna mat bhoolna
-      await axios.put(`http://localhost:5001/api/categories/edit/${category._id}`, data);
-      onSave();
-    } catch (err) { 
-      console.error(err);
-      alert("Update failed"); 
-    } finally { 
-      setLoading(false); 
-    }
-  };
+  try {
+    await axios.put(`${apiBaseUrl}/api/categories/edit/${category._id}`, data);
+    onSave();
+  } catch (err) { 
+    console.error(err);
+    alert("Update failed"); 
+  } finally { 
+    setLoading(false); 
+  }
+};
 
   return (
     <div className="w-full">

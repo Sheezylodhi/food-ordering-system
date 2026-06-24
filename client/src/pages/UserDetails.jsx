@@ -7,16 +7,24 @@ const UserDetails = () => {
     const [user, setUser] = useState(null);
     const [orders, setOrders] = useState([]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            // User aur uske orders dono le aao
-            const { data: userData } = await axios.get(`http://localhost:5001/api/admin/users/${id}`);
-            const { data: orderData } = await axios.get(`http://localhost:5001/api/admin/orders-by-email/${userData.email}`);
-            setUser(userData);
-            setOrders(orderData);
-        };
-        fetchData();
-    }, [id]);
+   useEffect(() => {
+  const fetchData = async () => {
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+    
+    try {
+      // User aur uske orders dono le aao
+      const { data: userData } = await axios.get(`${apiBaseUrl}/api/admin/users/${id}`);
+      const { data: orderData } = await axios.get(`${apiBaseUrl}/api/admin/orders-by-email/${userData.email}`);
+      
+      setUser(userData);
+      setOrders(orderData);
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+    }
+  };
+  
+  fetchData();
+}, [id]);
 
     if (!user) return <div>Loading...</div>;
 

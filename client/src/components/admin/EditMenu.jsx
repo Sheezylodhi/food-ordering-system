@@ -19,14 +19,19 @@ const EditMenu = ({ item, onSave }) => {
   const [status, setStatus] = useState({ type: null, message: '' });
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await axios.get('http://localhost:5001/api/categories');
-        setCategories(res.data);
-      } catch (err) { console.error("Error fetching categories", err); }
-    };
-    fetchCategories();
-  }, []);
+  const fetchCategories = async () => {
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+    
+    try {
+      const res = await axios.get(`${apiBaseUrl}/api/categories`);
+      setCategories(res.data);
+    } catch (err) { 
+      console.error("Error fetching categories", err); 
+    }
+  };
+  
+  fetchCategories();
+}, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -37,23 +42,25 @@ const EditMenu = ({ item, onSave }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setStatus({ type: null, message: '' });
+  e.preventDefault();
+  setLoading(true);
+  setStatus({ type: null, message: '' });
+  
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
-    const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => data.append(key, value));
+  const data = new FormData();
+  Object.entries(formData).forEach(([key, value]) => data.append(key, value));
 
-    try {
-      await axios.put(`http://localhost:5001/api/admin/edit-item/${item._id}`, data);
-      setStatus({ type: 'success', message: 'Dish updated successfully!' });
-      setTimeout(onSave, 1500); // Success ke baad redirect
-    } catch (err) {
-      setStatus({ type: 'error', message: 'Failed to update. Check your connection.' });
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    await axios.put(`${apiBaseUrl}/api/admin/edit-item/${item._id}`, data);
+    setStatus({ type: 'success', message: 'Dish updated successfully!' });
+    setTimeout(onSave, 1500);
+  } catch (err) {
+    setStatus({ type: 'error', message: 'Failed to update. Check your connection.' });
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="max-w-6xl mx-auto pb-10">

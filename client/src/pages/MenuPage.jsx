@@ -12,16 +12,24 @@ const MenuPage = () => {
   const [activeCategory, setActiveCategory] = useState("All");
 
   useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = async () => {
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+    
+    try {
       const [menuRes, catRes] = await Promise.all([
-        axios.get('http://localhost:5001/api/admin/menu'),
-        axios.get('http://localhost:5001/api/categories')
+        axios.get(`${apiBaseUrl}/api/admin/menu`),
+        axios.get(`${apiBaseUrl}/api/categories`)
       ]);
+      
       setItems(menuRes.data);
       setCategories(['All', ...catRes.data.map(c => c.name)]);
-    };
-    fetchData();
-  }, []);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  };
+  
+  fetchData();
+}, []);
 
   const filteredItems = items.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());

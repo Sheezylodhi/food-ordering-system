@@ -6,19 +6,23 @@ const MenuSection = forwardRef((props, ref) => {
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [menuRes, catRes] = await Promise.all([
-          axios.get('http://localhost:5001/api/admin/menu'),
-          axios.get('http://localhost:5001/api/categories')
-        ]);
-        setMenuItems(menuRes.data);
-        setCategories(catRes.data);
-      } catch (err) { console.error("Error loading menu:", err); }
-    };
-    fetchData();
-  }, []);
+ useEffect(() => {
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  
+  const fetchData = async () => {
+    try {
+      const [menuRes, catRes] = await Promise.all([
+        axios.get(`${apiBaseUrl}/api/admin/menu`),
+        axios.get(`${apiBaseUrl}/api/categories`)
+      ]);
+      setMenuItems(menuRes.data);
+      setCategories(catRes.data);
+    } catch (err) { 
+      console.error("Error loading menu:", err); 
+    }
+  };
+  fetchData();
+}, []);
 
   return (
     <section ref={ref} className="py-32 px-6 max-w-7xl mx-auto bg-white">

@@ -20,12 +20,13 @@ function ProfilePage() {
   useEffect(() => {
    const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem('adminToken'); // Yahan 'token' ki jagah 'adminToken' karo
+      const token = localStorage.getItem('adminToken'); 
+       const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';// Yahan 'token' ki jagah 'adminToken' karo
       if (!token) return; // Agar token hi nahi hai toh request mat bhejo
       
-      const res = await axios.get('http://localhost:5001/api/auth/profile', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+     const res = await axios.get(`${apiBaseUrl}/api/auth/profile`, {
+    headers: { Authorization: `Bearer ${token}` }
+});
       setData(res.data);
     } catch (err) { 
       console.error("Error loading profile"); 

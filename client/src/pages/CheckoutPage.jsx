@@ -21,45 +21,49 @@ const CheckoutPage = () => {
   const subtotal = Number(total) || 0;
   const grandTotal = subtotal + shippingCost;
 
-  const handleCheckout = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+ const handleCheckout = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
-    try {
-      // Token get karo
-      const token = localStorage.getItem('token'); 
-      
-      // Step 1: Save Order Details to DB
-      // Headers add karo yahan
-      const { data } = await axios.post('http://localhost:5001/api/payment/save-order-details', {
-        customerDetails: { ...form, paymentMethod },
+  try {
+    // Token get karo
+    const token = localStorage.getItem('token'); 
+    
+    // Step 1: Save Order Details to DB
+    const { data } = await axios.post(`${apiBaseUrl}/api/payment/save-order-details`, {
+      customerDetails: { ...form, paymentMethod },
+      cart,
+      total: grandTotal,
+      paymentMethod
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    // Step 2: Handle Payment Logic
+    if (paymentMethod === 'Online') {
+      const res = await axios.post(`${apiBaseUrl}/api/payment/create-checkout-session`, {
         cart,
-        total: grandTotal,
-        paymentMethod
+        orderId: data.orderId
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
-      // Step 2: Handle Payment Logic
-      if (paymentMethod === 'Online') {
-        const res = await axios.post('http://localhost:5001/api/payment/create-checkout-session', {
-          cart,
-          orderId: data.orderId
-        });
-
-        if (res.data && res.data.url) {
-          window.location.href = res.data.url;
-        } else {
-          alert("Payment gateway error.");
-        }
+      if (res.data && res.data.url) {
+        window.location.href = res.data.url;
       } else {
-        window.location.href = `/success?orderId=${data.orderId}`; 
+        alert("Payment gateway error.");
       }
-    } catch (err) {
-      console.error("Error details:", err);
-      alert("Failed to process order.");
-    } finally {
-      setLoading(false);
+    } else {
+      window.location.href = `/success?orderId=${data.orderId}`; 
     }
-  };
+  } catch (err) {
+    console.error("Error details:", err);
+    alert("Failed to process order.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-white">

@@ -11,10 +11,16 @@ const AdminOrders = () => {
 
     useEffect(() => { fetchOrders(); }, []);
 
-    const fetchOrders = async () => {
-        const { data } = await axios.get('http://localhost:5001/api/admin/orders');
-        setOrders(data);
-    };
+  const fetchOrders = async () => {
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  
+  try {
+    const { data } = await axios.get(`${apiBaseUrl}/api/admin/orders`);
+    setOrders(data);
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+  }
+};
 
     const filteredOrders = useMemo(() => {
         return orders.filter(o => 
@@ -29,11 +35,17 @@ const AdminOrders = () => {
     const currentOrders = filteredOrders.slice(indexOfFirst, indexOfLast);
     const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
 
-    const updateStatus = async (id, status) => {
-        await axios.patch(`http://localhost:5001/api/admin/orders/${id}`, { status });
-        setSelectedOrder(null);
-        fetchOrders();
-    };
+  const updateStatus = async (id, status) => {
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  
+  try {
+    await axios.patch(`${apiBaseUrl}/api/admin/orders/${id}`, { status });
+    setSelectedOrder(null);
+    fetchOrders();
+  } catch (err) {
+    console.error("Error updating order status:", err);
+  }
+};
 
     return (
         <div className="p-8 space-y-6 bg-white min-h-screen font-sans">

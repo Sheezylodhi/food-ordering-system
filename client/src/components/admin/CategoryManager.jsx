@@ -11,6 +11,7 @@ const CategoryManager = () => {
  const handleAdd = async (e) => {
     e.preventDefault();
     if (!formData.icon) return alert("Please select an icon!");
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
     
     setLoading(true);
     setStatus({ type: null, message: '' });
@@ -19,18 +20,18 @@ const CategoryManager = () => {
     data.append('name', formData.name);
     data.append('icon', formData.icon); // File object yahan se jayega
 
-    try {
-      await axios.post('http://localhost:5001/api/categories/add', data);
-      setStatus({ type: 'success', message: 'Category created successfully!' });
-      setFormData({ name: '', icon: null });
-      setPreview(null);
-    } catch (err) {
-      console.error(err);
-      setStatus({ type: 'error', message: 'Failed to create category.' });
-    } finally {
-      setLoading(false);
-      setTimeout(() => setStatus({ type: null, message: '' }), 4000);
-    }
+   try {
+    await axios.post(`${apiBaseUrl}/api/categories/add`, data);
+    setStatus({ type: 'success', message: 'Category created successfully!' });
+    setFormData({ name: '', icon: null });
+    setPreview(null);
+  } catch (err) {
+    console.error(err);
+    setStatus({ type: 'error', message: 'Failed to create category.' });
+  } finally {
+    setLoading(false);
+    setTimeout(() => setStatus({ type: null, message: '' }), 4000);
+  }
   };
 
   return (
