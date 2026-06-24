@@ -51,7 +51,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     res.json({ received: true });
 });
 
-// routes/payments.js
+
 router.post('/save-order-details', async (req, res) => {
     try {
         const { customerDetails, cart, total, paymentMethod } = req.body;

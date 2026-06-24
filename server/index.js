@@ -12,6 +12,12 @@ const reservationRoutes = require('./routes/reservationRoutes');
 
 const app = express();
 
+app.use(cors({
+    origin: ["https://onlineresturantfood.netlify.app", "http://localhost:5173"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+}));
+
 // 1. Webhook Route ko sabse pehle rakhein (Raw body chahiye hoti hai)
 // Is route ko yahan handle karne se `express.json()` ka asar is par nahi padega.
 app.use('/api/payments', paymentRoutes);
@@ -20,11 +26,7 @@ app.use('/api/payments', paymentRoutes);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors({
-    origin: ["https://onlineresturantfood.netlify.app", "http://localhost:5173"],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-}));
+
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URI)
