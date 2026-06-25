@@ -19,7 +19,6 @@ const { activeTab } = useOutletContext();
 
   return (
     <>
-      <h1 className="text-3xl font-bold mb-6">{activeTab}</h1>
       
       {activeTab === 'Dashboard' && <Dashboard />}
       {activeTab === 'Orders' && <AdminOrders />}
